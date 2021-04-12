@@ -1,7 +1,7 @@
 {
   "pluginName": "单位换算",
   "description": "单位换算",
-  "homepage": "https://github.com/utools-blowsnow/web-developer",
+  "homepage": "https://github.com/utools-blowsnow/unit-calc",
   "author": "blowsnow",
   "main": "index.html",
   "preload": "preload.js",
