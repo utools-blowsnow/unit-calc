@@ -1,0 +1,19 @@
+{
+  "pluginName": "单位换算",
+  "description": "单位换算",
+  "homepage": "https://github.com/utools-blowsnow/web-developer",
+  "author": "blowsnow",
+  "main": "index.html",
+  "preload": "preload.js",
+  "logo": "logo.png",
+  "version": "1.6.0",
+  "features": [
+    {
+      "code": "open",
+      "explain": "单位换算",
+      "cmds":[
+        "单位换算"
+      ]
+    }
+  ]
+}

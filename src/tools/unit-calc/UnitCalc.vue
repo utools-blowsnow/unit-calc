@@ -1,0 +1,134 @@
+<template>
+  <div class="UnitCalc">
+    <container :title="currentUnit.name" >
+      <template slot="head">
+        <span style="margin: 0 10px;">待换算值：</span>
+        <el-input-number size="mini" style="width: 120px;" v-model="value" placeholder="待换算值" @change="calc"></el-input-number>
+        <el-select size="mini" style="width: 100px;margin-left: 20px;" v-model="srcUnit" placeholder="选择转换方式" @change="calc">
+          <el-option
+              v-for="item in unitTypes"
+              :key="item"
+              :label="item"
+              :value="item">
+          </el-option>
+        </el-select>
+        <span style="padding: 0 10px;"><=></span>
+        <el-select size="mini" style="width: 100px;" v-model="toUnit" placeholder="选择转换方式" @change="calc">
+          <el-option label="全部" value="全部"></el-option>
+          <el-option
+              v-for="item in unitTypes"
+              :key="item"
+              :label="item"
+              :value="item">
+          </el-option>
+        </el-select>
+      </template>
+      <el-table
+          :data="results"
+          style="width: 100%">
+        <el-table-column
+            prop="value"
+            label="数据"
+            min-width="180">
+        </el-table-column>
+        <el-table-column
+            prop="unit"
+            label="单位"
+            min-width="380">
+        </el-table-column>
+      </el-table>
+    </container>
+  </div>
+</template>
+
+<script type="text/ecmascript-6">
+import Container from "../../components/Container";
+import UnitTools from '@/lib/unitTools';
+
+export default {
+  name: "UnitCalc",
+  info: function (){
+    let list = [];
+    for(let key of Object.keys(UnitTools.calcData)){
+      let data = UnitTools.calcData[key];
+      let cmds = [];
+      for(let name of Object.keys(data.init)){
+        cmds.push({
+          "type": "regex",
+          "label": name,
+          "match": "/[0-9\.]+"+name+"/i",
+        })
+      }
+      list.push({
+        code: data.name,
+        label: data.name,
+        logo: "",
+        desc: "",
+        cmds: cmds
+      })
+    }
+    return list
+  },
+  components: {Container},
+  data() {
+    return {
+      results: [],
+
+      value: 1,
+      srcUnit: null,
+      toUnit: '全部',
+
+      currentUnit: {}
+    }
+  },
+  computed:{
+    unitTypes: function (){
+      if (this.currentUnit.calc){
+        return Object.keys(this.currentUnit.calc);
+      }
+      return [];
+    }
+  },
+  mounted(){
+
+  },
+  methods: {
+    callbackReturn(){
+      this.$emit("callbackReturn");
+    },
+    init(code,value=null){
+      for(let key of Object.keys(UnitTools.calcData)){
+        let data = UnitTools.calcData[key];
+        if (data.name === code){
+          this.currentUnit = data;
+          this.currentUnit.key = key;
+          break;
+        }
+      }
+      if (value){
+        let preg = /^([0-9.]+)(.*?)$/
+        let matches = value.match(preg);
+        this.value = matches[1];
+        this.srcUnit = matches[2];
+      }else{  // 设置默认
+        this.value = 1;
+        this.srcUnit = Object.keys(this.currentUnit.calc)[0];
+      }
+      this.calc();
+    },
+    setValue(payload, type,code){
+      this.init(code,payload);
+    },
+    calc(){
+      console.log(this.currentUnit.key,this.value,this.srcUnit,'全部');
+      this.results = UnitTools.calc(this.currentUnit.key,this.value,this.srcUnit,this.toUnit);
+    }
+  },
+}
+</script>
+
+<style lang="stylus" rel="stylesheet/stylus">
+.UnitCalc {
+
+}
+</style>
