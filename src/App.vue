@@ -146,4 +146,7 @@ export default {
   height: 22px;
   overflow: hidden;
 }
+.wrapper{
+  width auto!important;
+}
 </style>

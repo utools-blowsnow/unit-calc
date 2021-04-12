@@ -23,20 +23,30 @@
           </el-option>
         </el-select>
       </template>
-      <el-table
-          :data="results"
-          style="width: 100%">
-        <el-table-column
-            prop="value"
-            label="数据"
-            min-width="180">
-        </el-table-column>
-        <el-table-column
-            prop="unit"
-            label="单位"
-            min-width="380">
-        </el-table-column>
-      </el-table>
+      <el-row :gutter="20">
+        <el-col :span="12" v-for="item in results">
+          <div class="unit-result-item">
+            <span style="float: left">{{ item.value }}</span>
+            <span style="float: right">{{ item.unit }}</span>
+            <span class="clearfix"></span>
+          </div>
+        </el-col>
+      </el-row>
+
+<!--      <el-table-->
+<!--          :data="results"-->
+<!--          style="width: 100%">-->
+<!--        <el-table-column-->
+<!--            prop="value"-->
+<!--            label="数据"-->
+<!--            min-width="180">-->
+<!--        </el-table-column>-->
+<!--        <el-table-column-->
+<!--            prop="unit"-->
+<!--            label="单位"-->
+<!--            min-width="380">-->
+<!--        </el-table-column>-->
+<!--      </el-table>-->
     </container>
   </div>
 </template>
@@ -129,6 +139,11 @@ export default {
 
 <style lang="stylus" rel="stylesheet/stylus">
 .UnitCalc {
-
+  .unit-result-item{
+    border-bottom: 1px solid #eaeaea;
+    margin-bottom 10px;
+    padding-bottom 10px;
+    margin: 5px 20px;
+  }
 }
 </style>
