@@ -69,6 +69,28 @@ export default {
           "match": "/[0-9\.]+"+name+"/i",
         })
       }
+      // 别名
+      if (data.alias){
+        for(let name of Object.keys(data.alias)){
+          let alias = data.alias[name];
+          if (alias instanceof Array){
+            for(let aliasName of alias){
+              cmds.push({
+                "type": "regex",
+                "label": name,
+                "match": "/[0-9\.]+"+aliasName+"/i",
+              })
+            }
+          }else{
+            cmds.push({
+              "type": "regex",
+              "label": name,
+              "match": "/[0-9\.]+"+alias+"/i",
+            })
+          }
+        }
+      }
+
       list.push({
         code: data.name,
         label: data.name,
@@ -115,6 +137,7 @@ export default {
           break;
         }
       }
+      console.log(code,value);
       if (value){
         let preg = /^([0-9.]+)(.*?)$/
         let matches = value.match(preg);
@@ -124,6 +147,9 @@ export default {
         this.value = 1;
         this.srcUnit = Object.keys(this.currentUnit.calc)[0];
       }
+      if (!this.currentUnit.init[this.srcUnit]){
+        this.srcUnit = this.unitAlias(this.currentUnit.key,this.srcUnit);
+      }
       this.calc();
     },
     setValue(payload, type,code){
@@ -132,6 +158,19 @@ export default {
     calc(){
       console.log(this.currentUnit.key,this.value,this.srcUnit,'全部');
       this.results = UnitTools.calc(this.currentUnit.key,this.value,this.srcUnit,this.toUnit);
+    },
+
+    unitAlias(name,alias){
+      let data = UnitTools.calcData[name];
+      for(let key of Object.keys(data.alias)){
+        let keyAlias = data.alias[key];
+        if (keyAlias instanceof Array){
+          for(let name of keyAlias){
+            if (name === alias) return key;
+          }
+        }else if (keyAlias === alias) return key;
+      }
+      return alias;
     }
   },
 }

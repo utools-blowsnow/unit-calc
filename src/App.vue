@@ -82,6 +82,7 @@ export default {
       this.payload = payload;
       this.$nextTick(() => {
         let type = null;
+
         this.$refs.node.setValue(payload, type,code);
       })
     })
