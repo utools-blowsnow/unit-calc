@@ -142,7 +142,7 @@ export default {
         let preg = /^([0-9.]+)(.*?)$/
         let matches = value.match(preg);
         this.value = matches[1];
-        this.srcUnit = matches[2];
+        this.srcUnit = matches[2].toLowerCase();
       }else{  // 设置默认
         this.value = 1;
         this.srcUnit = Object.keys(this.currentUnit.calc)[0];

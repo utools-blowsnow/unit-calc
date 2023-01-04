@@ -641,6 +641,29 @@ var data = {
             label: "",
             options: ["元", "角", "分"]
         }]
+    },
+    hex: {
+        name: '进制转换',
+        calc: {
+            "二进制": "parseInt(x).toString(2)_二进制",
+            "八进制": "parseInt(x).toString(8)_八进制",
+            "十进制": "parseInt(x).toString(10)_十进制",
+            "十六进制": "parseInt(x).toString(16)_十六进制"
+        },
+        init: {
+            "二进制": "parseInt(x,2)_二进制",
+            "八进制": "parseInt(x,8)_八进制",
+            "十进制": "x_十进制",
+            "十六进制": "parseInt(x,16)_十六进制"
+        },
+        alias: {
+            "二进制": ['bin'],
+            "八进制": ['oct'],
+            "十进制": ['dec'],
+            "十六进制": ['hex']
+        },
+        iu: "二进制",
+        group: []
     }
 };
 
@@ -674,6 +697,7 @@ function calc(name, value, srcUnit, toUnit) {
     return l
 }
 
+
 /**
  * 计算值
  * @param x
@@ -681,10 +705,12 @@ function calc(name, value, srcUnit, toUnit) {
  * @private
  */
 function _calc(x) {
+    if (x instanceof Function) return x();
     return new Function("return " + x)()
 }
 
 function t(x, _) {
+    if (typeof x === 'string') return x;
     var t = x.toExponential(_);
     return (t + "").match(new RegExp(".0{" + _ + "}e")) ? x.toExponential(0) : t
 }
@@ -714,7 +740,10 @@ function getCalc(value, calcStr) {
 
 
 
+
+
 export default {
     calc: calc,
     calcData: data
 }
+
