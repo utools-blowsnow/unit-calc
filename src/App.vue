@@ -5,7 +5,7 @@
         <div v-for="(item,index) in items" :key="index" class="col-md-3 col-xs-4 item-container" @click="openTools(item)">
           <div class="item">
             <div class="logo-box">
-              <img :src="item.logo||'https://static.easyicon.net/preview/125/1256386.gif'" width="48" height="48" alt="coderunner">
+              <img :src="item.logo||'logo.png'" width="48" height="48" alt="coderunner">
             </div>
             <div class="info-box">
               <h3>{{ item.label }}</h3>
