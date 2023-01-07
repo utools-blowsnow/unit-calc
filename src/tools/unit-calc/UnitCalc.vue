@@ -62,11 +62,11 @@ export default {
     for(let key of Object.keys(UnitTools.calcData)){
       let data = UnitTools.calcData[key];
       let cmds = [];
-      for(let name of Object.keys(data.init)){
+      for(let name of Object.keys(data.calc)){
         cmds.push({
           "type": "regex",
           "label": name,
-          "match": "/[0-9\.]+"+name+"/i",
+          "match": "/[0-9\.]+"+name+"$/i",
         })
       }
       // 别名
@@ -78,14 +78,14 @@ export default {
               cmds.push({
                 "type": "regex",
                 "label": name,
-                "match": "/[0-9\.]+"+aliasName+"/i",
+                "match": "/[0-9\.]+"+aliasName+"$/i",
               })
             }
           }else{
             cmds.push({
               "type": "regex",
               "label": name,
-              "match": "/[0-9\.]+"+alias+"/i",
+              "match": "/[0-9\.]+"+alias+"$/i",
             })
           }
         }
@@ -155,9 +155,19 @@ export default {
     setValue(payload, type,code){
       this.init(code,payload);
     },
-    calc(){
-      console.log(this.currentUnit.key,this.value,this.srcUnit,'全部');
-      this.results = UnitTools.calc(this.currentUnit.key,this.value,this.srcUnit,this.toUnit);
+    async calc() {
+      console.log(this.currentUnit.key, this.value, this.srcUnit, '全部');
+      const loading = this.$loading({
+        lock: true,
+        text: '计算中',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
+      try {
+        this.results = await UnitTools.calc(this.currentUnit.key, this.value, this.srcUnit, this.toUnit);
+      }finally {
+        loading.close();
+      }
     },
 
     unitAlias(name,alias){
@@ -166,9 +176,9 @@ export default {
         let keyAlias = data.alias[key];
         if (keyAlias instanceof Array){
           for(let name of keyAlias){
-            if (name === alias) return key;
+            if (name.toLowerCase() === alias.toLowerCase()) return key;
           }
-        }else if (keyAlias === alias) return key;
+        }else if (keyAlias.toLowerCase() === alias.toLowerCase()) return key;
       }
       return alias;
     }

@@ -1,4 +1,48 @@
 var o = 14, n = 7, l = 4;
+const axios = require('axios');
+
+const getExchanges = async function () {
+    let exchanges = utools.dbStorage.getItem("exchanges");
+    if (exchanges){
+        exchanges = JSON.parse(exchanges);
+        // 判断 exchanges.build_time 是否超出一天
+        let now = new Date().getTime();
+        let buildTime = new Date(exchanges.build_time).getTime();
+        if (now - buildTime > 24 * 60 * 60 * 1000){
+            exchanges = false;
+        }
+    }
+    if (exchanges){
+        return exchanges.data;
+    }
+    return Promise.race([
+        axios("https://ghproxy.com/https://raw.githubusercontent.com/other-blowsnow/exchange_reptile/master/exchange.json"),
+        axios("https://cdn.jsdelivr.net/gh/other-blowsnow/exchange_reptile/exchange.json")
+    ]).then(res => {
+        utools.dbStorage.setItem("exchanges",JSON.stringify(res.data));
+        return res.data.data;
+    })
+}
+const exchange = async function (value, srcUnit , toUnit){
+    let exchanges = await getExchanges();
+    let srcExchangeItem = exchanges.find(item => item.name === srcUnit);
+    if (srcUnit === "人民币"){
+        srcExchangeItem = {
+            price: 1
+        }
+    }
+    if (!srcExchangeItem) return 0;
+    // 人民币金额
+    let rate = srcExchangeItem.price;
+    if (toUnit === "人民币"){
+        return value * rate;
+    }
+    let toExchangeItem = exchanges.find(item => item.name === toUnit);
+    if (!toExchangeItem) return 0;
+    let price = (value * rate) / toExchangeItem.price;
+
+    return parseFloat(price.toFixed(6))
+}
 
 var data = {
     length: {
@@ -664,10 +708,35 @@ var data = {
         },
         iu: "二进制",
         group: []
+    },
+    exchange: {
+        name: '货币汇率换算',
+        calc: {
+            "人民币": exchange,
+            "美元": exchange,
+            "欧元": exchange,
+            "英镑": exchange,
+            "日元": exchange,
+            "韩元": exchange,
+            "卢布": exchange,
+            "黄金": exchange,
+            "白银": exchange,
+            "澳元": exchange,
+            "加元": exchange,
+            "澳门币": exchange,
+            "台币": exchange,
+            "港币": exchange,
+            "新币": exchange,
+            "越币": exchange,
+            "土币": exchange,
+            "泰铢": exchange,
+        },
+        init: {},
+        alias: {}
     }
 };
 
-function calc(name, value, srcUnit, toUnit) {
+async function calc(name, value, srcUnit, toUnit = null) {
     var l = [], e = data[name];
     // 如果相同的单位  直接返回值
     if (srcUnit === toUnit){
@@ -677,26 +746,35 @@ function calc(name, value, srcUnit, toUnit) {
         });
         return l;
     }
-    var c = _calc(getCalc(value, e.init[srcUnit])[0]);
-    if ("全部" === toUnit) {
-        for (var u in e.calc)
-            if (u !== srcUnit) {
-                var r = _calc(getCalc(c, e.calc[u])[0]);
+    var initCalcValue = e.init[srcUnit];
+    if (!initCalcValue) initCalcValue = "" + value;
+    var initValue = await _calc2(initCalcValue, value , srcUnit , toUnit);
+    if ("全部" === toUnit || !toUnit) {
+        for (let unit in e.calc)
+            if (unit !== srcUnit) {
+                let unitValue = await _calc2(e.calc[unit], initValue , srcUnit, unit);
                 l.push({
-                    value: a(r),
-                    unit: e.calc[u].split("_")[1]
+                    value: toValue(unitValue),
+                    unit: e.calc[unit] instanceof Function ? unit :  e.calc[unit].split("_")[1]
                 })
             }
     } else {
-        var r = _calc(getCalc(c, e.calc[toUnit])[0]);
+        let unitValue = await _calc2(e.calc[toUnit], initValue , srcUnit,  toUnit);
         l.push({
-            value: a(r),
+            value: toValue(unitValue),
             unit: toUnit
         })
     }
     return l
 }
 
+async function _calc2(calcValue, value, srcUnit, toUnit) {
+    if (calcValue instanceof Function) {
+        return await calcValue(value, srcUnit, toUnit);
+    }
+    calcValue = getCalc(value, calcValue)[0];
+    return new Function("return " + calcValue)()
+}
 
 /**
  * 计算值
@@ -715,7 +793,7 @@ function t(x, _) {
     return (t + "").match(new RegExp(".0{" + _ + "}e")) ? x.toExponential(0) : t
 }
 
-function a(x) {
+function toValue(x) {
     var _, a, i, p = x + "", e = !1;
     if (p.indexOf(".") > -1) {
         var c = p.match(/\.\d+e[+-](\d+)$/);
@@ -740,10 +818,7 @@ function getCalc(value, calcStr) {
 
 
 
-
-
 export default {
     calc: calc,
     calcData: data
 }
-

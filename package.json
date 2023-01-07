@@ -8,12 +8,14 @@
   },
   "dependencies": {
     "axios": "^0.21.0",
+    "deasync": "^0.1.28",
     "element-ui": "^2.13.0",
     "fast-speedtest-api": "^0.3.2",
     "vue": "^2.6.10",
     "vuedraggable": "^2.23.2"
   },
   "devDependencies": {
+    "utools-api-types": "^3.0.0",
     "@vue/cli-service": "^4.1.0",
     "stylus": "^0.54.7",
     "stylus-loader": "^3.0.2",
