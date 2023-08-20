@@ -733,6 +733,29 @@ var data = {
         },
         init: {},
         alias: {}
+    },
+    netSpeed:{
+        name:"网速换算",
+        calc:{
+            bps:"x_bps",
+            Kbps:"x/1024_Kbps",
+            Mbps:"x/1024**2_Mbps",
+            Gbps:"x/1024**3_Gbps",
+            "Byte/s":"x/8_Byte/s",
+            "KByte/s": "x/8/1024_KByte/s",
+            "MByte/s": "x/8/1024**2_MByte/s",
+            "GByte/s": "x/8/1024**3_GByte/s",
+        },
+        init:{
+            bps:"x_bps",
+            Kbps:"x*1024_Kbps",
+            Mbps:"x*1024**2_Mbps",
+            Gbps:"x*1024**3_Gbps",
+            "Byte/s":"x*8_Byte/s",
+            "KByte/s": "x*8*1024_KByte/s",
+            "MByte/s": "x*8*1024**2_MByte/s",
+            "GByte/s": "x*8*1024**3_GByte/s",
+        }
     }
 };
 
@@ -813,7 +836,7 @@ function toValue(x) {
  * @return array ["(1*1000)/1", "米"]
  */
 function getCalc(value, calcStr) {
-    return calcStr.replace("x", value).split("_")
+    return calcStr.replace("x", typeof value === 'number' ? value : `'${value}'`).split("_")
 }
 
 

@@ -3,7 +3,9 @@
     <container :title="currentUnit.name" >
       <template slot="head">
         <span style="margin: 0 10px;">待换算值：</span>
-        <el-input-number size="mini" style="width: 120px;" v-model="value" placeholder="待换算值" @change="calc"></el-input-number>
+        <!-- 其实 `el-input-number` 也可以输入十六进制，只需以 `0x` 开头即可-->
+        <el-input v-if="currentUnit.key == 'hex' && srcUnit == '十六进制'" size="mini" style="width: 120px;" v-model="value" placeholder="待换算值" @change="calc"></el-input>
+        <el-input-number v-else size="mini" style="width: 120px;" v-model="value" placeholder="待换算值" @change="calc"></el-input-number>
         <el-select size="mini" style="width: 100px;margin-left: 20px;" v-model="srcUnit" placeholder="选择转换方式" @change="calc">
           <el-option
               v-for="item in unitTypes"
@@ -12,7 +14,7 @@
               :value="item">
           </el-option>
         </el-select>
-        <span style="padding: 0 10px;"><=></span>
+        <span style="padding: 0 10px;">&lt;=&gt;</span>
         <el-select size="mini" style="width: 100px;" v-model="toUnit" placeholder="选择转换方式" @change="calc">
           <el-option label="全部" value="全部"></el-option>
           <el-option
