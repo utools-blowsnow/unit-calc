@@ -836,7 +836,7 @@ function toValue(x) {
  * @return array ["(1*1000)/1", "米"]
  */
 function getCalc(value, calcStr) {
-    return calcStr.replace("x", value).split("_")
+    return calcStr.replace("x", typeof value === 'number' ? value : `'${value}'`).split("_")
 }
 
 
